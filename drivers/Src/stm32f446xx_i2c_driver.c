@@ -141,3 +141,24 @@ void I2C_DeInit(I2C_RegDef_t * pI2Cx){
 		I2C1_REG_RESET();
 	}
 }
+void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxbuffer, uint32_t Len, uint8_t SlaveAddr){
+  // 1. generate the start condition
+  I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
+    // 2. confirm that start generation is completed by checking the SB flag in the SR1
+    // Note: Until SB is cleared SCl will be stretched (pull to LOW)
+    while(! I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_FLAG_SB));
+
+    //3. Send the address of the slave with r/nw bit set to w(0)
+
+}
+void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx,uint8_t EnOrDi){
+    if (EnOrDi == ENABLE){
+        pI2Cx->CR1 |= (1 << I2C_CR1_START);
+    }
+}
+uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t FlagName){
+    if (pI2Cx->SR1 & FlagName){
+        return FLAG_SET;
+    }
+    return FLAG_RESET;
+}
